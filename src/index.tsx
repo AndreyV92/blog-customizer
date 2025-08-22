@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { StrictMode, CSSProperties } from 'react';
+import { StrictMode, CSSProperties, useState } from 'react';
 import clsx from 'clsx';
 
 import { Article } from './components/article/Article';
@@ -13,19 +13,27 @@ const domNode = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(domNode);
 
 const App = () => {
+	const [isOpen, setIsOpen] = useState(false);
+	const [globalSettings, setGlobalSettings] = useState(defaultArticleState);
+
 	return (
 		<main
 			className={clsx(styles.main)}
 			style={
 				{
-					'--font-family': defaultArticleState.fontFamilyOption.value,
-					'--font-size': defaultArticleState.fontSizeOption.value,
-					'--font-color': defaultArticleState.fontColor.value,
-					'--container-width': defaultArticleState.contentWidth.value,
-					'--bg-color': defaultArticleState.backgroundColor.value,
+					'--font-family': globalSettings.fontFamilyOption.value,
+					'--font-size': globalSettings.fontSizeOption.value,
+					'--font-color': globalSettings.fontColor.value,
+					'--container-width': globalSettings.contentWidth.value,
+					'--bg-color': globalSettings.backgroundColor.value,
 				} as CSSProperties
 			}>
-			<ArticleParamsForm />
+			<ArticleParamsForm
+				isOpen={isOpen}
+				setIsOpen={() => setIsOpen(!isOpen)}
+				globalSettings={globalSettings}
+				setGlobalSettings={setGlobalSettings}
+			/>
 			<Article />
 		</main>
 	);
