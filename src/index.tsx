@@ -13,7 +13,6 @@ const domNode = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(domNode);
 
 const App = () => {
-	const [isOpen, setIsOpen] = useState(false);
 	const [globalSettings, setGlobalSettings] = useState(defaultArticleState);
 
 	return (
@@ -29,8 +28,6 @@ const App = () => {
 				} as CSSProperties
 			}>
 			<ArticleParamsForm
-				isOpen={isOpen}
-				setIsOpen={() => setIsOpen(!isOpen)}
 				globalSettings={globalSettings}
 				setGlobalSettings={setGlobalSettings}
 			/>

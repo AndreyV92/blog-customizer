@@ -4,7 +4,7 @@ import { Button } from 'src/ui/button';
 import styles from './ArticleParamsForm.module.scss';
 import { Text } from 'src/ui/text';
 import { Select } from 'src/ui/select';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
 	ArticleStateType,
 	backgroundColors,
@@ -12,35 +12,51 @@ import {
 	fontSizeOptions,
 	contentWidthArr,
 	fontFamilyOptions,
+	defaultArticleState,
 } from 'src/constants/articleProps';
 import { RadioGroup } from 'src/ui/radio-group';
 import clsx from 'clsx';
+import { useOutsideClickClose } from '../../ui/select/hooks/useOutsideClickClose';
 
 type TArticleFormProps = {
-	isOpen: boolean;
 	globalSettings: ArticleStateType;
 	setGlobalSettings: (settings: ArticleStateType) => void;
-	setIsOpen: () => void;
 };
 
 export const ArticleParamsForm = ({
-	isOpen,
-	setIsOpen,
 	globalSettings,
 	setGlobalSettings,
 }: TArticleFormProps) => {
 	const [localSettings, setLocalSettings] = useState(globalSettings);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+	const rootRef = useRef<HTMLDivElement>(null);
+
+	useOutsideClickClose({
+		isOpen: !isMenuOpen,
+		onChange: setIsMenuOpen,
+		rootRef,
+		onClose: () => setIsMenuOpen(false),
+	});
 
 	const handleClickSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setGlobalSettings(localSettings);
 	};
 
+	const handleClickClearSettings = () => {
+		setLocalSettings(defaultArticleState);
+		setGlobalSettings(defaultArticleState);
+	};
+
 	return (
-		<>
-			<ArrowButton isOpen={isOpen} onClick={setIsOpen} />
+		<div ref={rootRef}>
+			<ArrowButton
+				isOpen={isMenuOpen}
+				onClick={() => setIsMenuOpen(!isMenuOpen)}
+			/>
 			<aside
-				className={`${styles.container} ${isOpen && styles.container_open} `}>
+				className={clsx(styles.container, isMenuOpen && styles.container_open)}>
 				<form className={styles.form} onSubmit={handleClickSubmit}>
 					<Text as='h3' size={31} weight={800} uppercase={true}>
 						задайте параметры
@@ -106,18 +122,22 @@ export const ArticleParamsForm = ({
 							onChange={(option) =>
 								setLocalSettings({
 									...localSettings,
-									['backgroundColor']: option,
+									['contentWidth']: option,
 								})
 							}
 						/>
 					</div>
 
 					<div className={styles.bottomContainer}>
-						<Button title='Сбросить' htmlType='reset' type='clear' />
+						<Button
+							title='Сбросить'
+							type='clear'
+							onClick={handleClickClearSettings}
+						/>
 						<Button title='Применить' htmlType='submit' type='apply' />
 					</div>
 				</form>
 			</aside>
-		</>
+		</div>
 	);
 };
